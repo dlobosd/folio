@@ -1,4 +1,4 @@
-# folio Currículum personal en Astro
+# folio. Currículum personal en Astro
 
 Proyecto estático construido con Astro. Contenido en español, tema blanco predeterminado, tema negro opcional y formato de impresión para guardar como PDF.
 
