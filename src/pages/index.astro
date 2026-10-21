@@ -1,0 +1,43 @@
+---
+import { perfil as p } from '../data/perfil.js';
+import '../styles/global.css';
+const safeURL = (value) => { try { const u = new URL(value); return ['https:', 'http:'].includes(u.protocol) ? u.href : null; } catch { return null; } };
+const email = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(p.email) ? p.email : null;
+const initials = p.nombre.trim().split(/\s+/).slice(0,2).map(word => word[0]).join('');
+---
+<!doctype html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="description" content={`${p.nombre} — ${p.profesion}. ${p.sobreMi}`}/>
+<title>{p.nombre} · Currículum</title>
+<script is:inline>
+try { document.documentElement.dataset.theme = localStorage.getItem('cv-astro-theme') === 'dark' ? 'dark' : 'light'; } catch {}
+</script>
+</head>
+<body>
+<a class="skip" href="#inicio">Ir al contenido</a>
+<aside class="sidebar"><a class="brand" href="#inicio" aria-label="Inicio">folio<span class="accent">.</span></a><small class="credit">made by diego lobos</small><div class="identity"><div class="avatar" aria-hidden="true">{initials.toUpperCase()}</div><p class="name">{p.nombre}</p><p class="muted">{p.profesion}</p></div><nav aria-label="Navegación principal"><a href="#inicio">Sobre mí</a><a href="#experiencia">Experiencia</a><a href="#proyectos">Proyectos</a><a href="#formacion">Formación</a><a href="#contacto">Contacto</a></nav><div class="sidebar-bottom"><button id="theme" class="theme" aria-label="Activar tema oscuro" aria-pressed="false">◐ <span>Cambiar tema</span></button></div></aside>
+<main><header class="topbar"><span>CURRÍCULUM & PORTAFOLIO</span><button id="print" type="button">Guardar CV / PDF ↓</button></header>
+<section id="inicio" class="hero">
+<div class="hero-copy"><p class="eyebrow"><span class="dot"></span> {p.disponibilidad}</p><h1>Hola, soy<br/>{p.nombre}<span class="accent">.</span></h1><p class="hero-role">{p.profesion}</p><p class="intro">{p.sobreMi}</p><div class="hero-actions"><a class="button" href="#contacto">Conversemos ↗</a><a href="#experiencia" class="text-link">Explorar mi trayectoria ↓</a></div></div>
+<div class="facts"><div><span>UBICACIÓN</span><p>{p.ubicacion}</p></div><div><span>ENFOQUE</span><p>{p.enfoque}</p></div><div><span>IDIOMAS</span><p>{p.idiomas}</p></div></div>
+</section>
+<section id="experiencia" class="section-grid"><div class="section-heading"><p class="eyebrow">01 / TRAYECTORIA</p><h2>Lo que he hecho<span class="accent">.</span></h2><p class="muted">Experiencia, aprendizajes y aportes.</p></div><div>{p.experiencia.map(job => <article class="job"><p class="period">{job.periodo}</p><h3>{job.cargo}</h3><p class="company">{job.empresa}</p><p class="muted">{job.descripcion}</p><div class="tags">{job.etiquetas.map(tag => <span>{tag}</span>)}</div></article>)}</div></section>
+<section id="proyectos"><div class="section-heading"><p class="eyebrow">02 / TRABAJO SELECCIONADO</p><h2>Ideas en práctica<span class="accent">.</span></h2></div><div class="projects">{p.proyectos.map((project, i) => <article class="project"><div class={`project-art art-${i % 2}`} aria-hidden="true"><span class="project-number">{String(i + 1).padStart(2,'0')}</span><span class="art-shape"></span></div><div class="project-body"><p class="eyebrow">{project.categoria}</p><h3>{project.nombre}</h3><p class="muted">{project.descripcion}</p><div class="tags">{project.tecnologias.map(tag => <span>{tag}</span>)}</div>{safeURL(project.url) && <a class="project-link" href={safeURL(project.url)} target="_blank" rel="noopener noreferrer">Ver proyecto ↗</a>}</div></article>)}</div></section>
+<section id="formacion" class="section-grid"><div class="section-heading"><p class="eyebrow">03 / APRENDIZAJE</p><h2>Una base para crecer<span class="accent">.</span></h2></div><div>{p.formacion.map(item => <article class="study"><p class="period">{item.periodo}</p><h3>{item.titulo}</h3><p class="muted">{item.institucion}</p></article>)}<h3 class="skills-heading">Herramientas & habilidades</h3><div class="tags">{p.habilidades.map(skill => <span>{skill}</span>)}</div></div></section>
+<section id="contacto" class="contact"><p class="eyebrow">04 / SIGUIENTE PASO</p><h2>Hablemos de<br/>lo que viene<span class="accent">.</span></h2><p class="muted">{p.contacto}</p>{email ? <a class="email" href={`mailto:${email}`}>{email} ↗</a> : <p class="setup-note">Añade tu correo en src/data/perfil.js para activar el contacto.</p>}<div class="socials">{[['GitHub',p.github],['LinkedIn',p.linkedin]].map(([label,url]) => safeURL(url) && <a href={safeURL(url)} target="_blank" rel="noopener noreferrer">{label} ↗</a>)}</div></section>
+<footer><div><span>© {new Date().getFullYear()} {p.nombre}</span><small class="template-credit">Template Folio made by Diego Lobos</small></div><a href="#inicio">Volver arriba ↑</a></footer>
+</main>
+<script>
+const themeButton = document.getElementById('theme');
+function syncTheme() { const dark = document.documentElement.dataset.theme === 'dark'; themeButton?.setAttribute('aria-label', `Activar tema ${dark ? 'claro' : 'oscuro'}`); themeButton?.setAttribute('aria-pressed', String(dark)); }
+syncTheme();
+themeButton?.addEventListener('click', () => { const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = theme; try { localStorage.setItem('cv-astro-theme', theme); } catch {} syncTheme(); });
+document.getElementById('print')?.addEventListener('click', () => window.print());
+</script>
+</body>
+</html>
+
+
+
